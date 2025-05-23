@@ -334,9 +334,16 @@ contents =
     end
 
     defp default_array_implementation() do
-      Application.get_env(:arrays, :default_array_implementation, @default_array_implementation)
+      # Application.get_env(:arrays, :default_array_implementation, @default_array_implementation)
+    Arrays.ErlangArray
     end
-
+    
+    
+    @spec new(integer()) :: array()
+  def new(size) when is_integer(size) do
+    array = empty()
+    resize(array,size)
+  end
     @doc """
     Creates a new, empty array with default options.
 
@@ -352,6 +359,8 @@ contents =
     @spec new(Enum.t()) :: array()
     def new(enumerable), do: new(enumerable, [])
 
+    
+  
     @doc """
     Creates a new array, receiving its elements from the given `Enumerable`, with the given options.
 
