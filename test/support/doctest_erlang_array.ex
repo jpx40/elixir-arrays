@@ -1,10 +1,10 @@
-# Copy of `Arrays` module with different default representation
+# Copy of `Array` module with different default representation
 # so that we can re-use the doctests for `ErlangArray`.
 Module.create(
-  Arrays.Test.Support.Arrays.DoctestErlangArray,
+  Array.Test.Support.Array.DoctestErlangArray,
   quote location: :keep do
-    @default_array_implementation Arrays.Implementations.ErlangArray
-    unquote(Arrays.__internal_module_contents__())
+    @default_array_implementation Array.Implementations.ErlangArray
+    unquote(Array.__internal_module_contents__())
   end,
   Macro.Env.location(__ENV__)
 )
