@@ -512,6 +512,10 @@ contents =
     @spec append(array, item :: any) :: array
     defdelegate append(array, item), to: Array.Protocol
 
+    
+   @spec len(array) :: integer()  
+  
+   defdelegate len(array), to: Array.Protocol
     @doc """
     Extracts ('pops') a single element from the end of the array.
 
