@@ -1,16 +1,16 @@
-defmodule Arrays.Mixfile do
+defmodule Array.Mixfile do
   use Mix.Project
-  @source_url "https://github.com/Qqwy/elixir-arrays"
+  @source_url "https://github.com/Qqwy/elixir-Array"
 
   def project do
     [
-      app: :arrays,
+      app: :Array,
       version: "2.1.1",
       elixir: "~> 1.9",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      name: "Arrays",
+      name: "Array",
       description: description(),
       source_url: @source_url,
       package: package(),
@@ -54,13 +54,13 @@ defmodule Arrays.Mixfile do
 
   defp description do
     """
-    Well-structured Arrays with fast random-element-access for Elixir, offering a common interface with multiple implementations (MapArray, Erlang :array, etc.) with varying performance guarantees that can be switched in your configuration.
+    Well-structured Array with fast random-element-access for Elixir, offering a common interface with multiple implementations (MapArray, Erlang :array, etc.) with varying performance guarantees that can be switched in your configuration.
     """
   end
 
   defp package() do
     [
-      name: :arrays,
+      name: :Array,
       files: ["lib", "mix.exs", "README*"],
       maintainers: ["Qqwy/Wiebe-Marten Wijnja"],
       licenses: ["Apache 2.0"],
@@ -70,15 +70,15 @@ defmodule Arrays.Mixfile do
 
   defp docs() do
     [
-      main: "Arrays",
+      main: "Array",
       logo: "brand/logo_text.png",
       groups_for_modules: [
-        Main: [Arrays],
-        Implementations: ~r{^Arrays.Implementations},
-        "For Implementers": [Arrays.Protocol, Arrays.CommonProtocolImplementations],
+        Main: [Array],
+        Implementations: ~r{^Array.Implementations},
+        "For Implementers": [Array.Protocol, Array.CommonProtocolImplementations],
         Other: ~r"^.*"
       ],
-      nest_modules_by_prefix: [Arrays, Arrays.Implementations]
+      nest_modules_by_prefix: [Array, Array.Implementations]
     ]
   end
 end
