@@ -13,7 +13,7 @@ defmodule Arrays.Implementations.ErlangArray do
 
   alias __MODULE__
 
-  defstruct len: 0, contents: :array.new([default: nil])
+  defstruct len: 0, contents: :array.new(default: nil)
 
   @doc """
   Create an `%ErlangArray{}`-struct from an `:array`-record.
@@ -23,7 +23,7 @@ defmodule Arrays.Implementations.ErlangArray do
       #Arrays.Implementations.ErlangArray<[]>
   """
   def from_raw(raw_array) do
-    %ErlangArray{ len: :array.size(raw_array),contents: raw_array}
+    %ErlangArray{len: :array.size(raw_array), contents: raw_array}
   end
 
   @doc """
@@ -32,26 +32,29 @@ defmodule Arrays.Implementations.ErlangArray do
         iex> Arrays.new([1, 2, 3], implementation: Arrays.Implementations.ErlangArray) |> ErlangArray.to_raw()
         {:array, 3, 10, nil, {1, 2, 3, nil, nil, nil, nil, nil, nil, nil}}
   """
-  def to_raw(%ErlangArray{len: _,contents: contents}) do
-    
+  def to_raw(%ErlangArray{len: _, contents: contents}) do
     contents
   end
 
   if Code.ensure_loaded?(FunLand.Mappable) do
-    Module.eval_quoted(__MODULE__,
+    Module.eval_quoted(
+      __MODULE__,
       quote do
         use FunLand.Mappable
+
         @doc """
         Implementation for `FunLand.Mappable.map`.
 
         Note that `FunLand` is an optional dependency of `Arrays` so you need to add it to your `mix.exs` dependencies manually to use it.
         """
         def map(array, fun), do: Arrays.Protocol.map(array, fun)
-    end)
+      end
+    )
   end
 
   if Code.ensure_loaded?(FunLand.Reducible) do
-    Module.eval_quoted(__MODULE__,
+    Module.eval_quoted(
+      __MODULE__,
       quote do
         use FunLand.Reducible, auto_enumerable: false
 
@@ -61,10 +64,11 @@ defmodule Arrays.Implementations.ErlangArray do
 
         Note that `FunLand` is an optional dependency of `Arrays` so you need to add it to your `mix.exs` dependencies manually to use it.
         """
-        def reduce(array = %ErlangArray{len: len, }, acc, fun) do
+        def reduce(array = %ErlangArray{len: len}, acc, fun) do
           Arrays.Protocol.reduce(array, acc, fun)
         end
-      end)
+      end
+    )
   end
 
   @behaviour Access
@@ -81,7 +85,7 @@ defmodule Arrays.Implementations.ErlangArray do
   def fetch(%ErlangArray{contents: contents}, index) when index < 0 do
     size = :array.size(contents)
 
-    if index < (-size) do
+    if index < -size do
       :error
     else
       {:ok, :array.get(index + size, contents)}
@@ -89,19 +93,23 @@ defmodule Arrays.Implementations.ErlangArray do
   end
 
   @undefined_pop_message """
-  There is no efficient implementation possible to remove an element from a random location in an array, so `Access.pop/2` (and returning `:pop` from `Access.get_and_update/3` ) are not supported by #{inspect(__MODULE__)}. If you want to remove the last element, use `Arrays.extract/1`.
-  """ |> String.trim
+                         There is no efficient implementation possible to remove an element from a random location in an array, so `Access.pop/2` (and returning `:pop` from `Access.get_and_update/3` ) are not supported by #{inspect(__MODULE__)}. If you want to remove the last element, use `Arrays.extract/1`.
+                         """
+                         |> String.trim()
 
   @impl Access
-  def get_and_update(array = %ErlangArray{len: len, contents: contents}, index, function) when index >= 0 do
+  def get_and_update(array = %ErlangArray{len: len, contents: contents}, index, function)
+      when index >= 0 do
     if index >= :array.size(contents) do
       raise ArgumentError
     else
       value = :array.get(index, contents)
+
       case function.(value) do
         {get, new_value} ->
           new_contents = :array.set(index, new_value, contents)
-          {get, %ErlangArray{ array | contents: new_contents, len: len}}
+          {get, %ErlangArray{array | contents: new_contents, len: len}}
+
         :pop ->
           raise ArgumentError, @undefined_pop_message
       end
@@ -109,8 +117,9 @@ defmodule Arrays.Implementations.ErlangArray do
   end
 
   @impl Access
-  def get_and_update(array = %ErlangArray{len: len, contents: _}, index, function) when index < 0 do
-    if (index < len) do
+  def get_and_update(array = %ErlangArray{len: len, contents: _}, index, function)
+      when index < 0 do
+    if index < len do
       raise ArgumentError
     else
       get_and_update(array, index + len, function)
@@ -140,21 +149,21 @@ defmodule Arrays.Implementations.ErlangArray do
     @impl true
     def map(array = %ErlangArray{len: len, contents: contents}, fun) do
       new_contents = :array.map(fn _index, val -> fun.(val) end, contents)
-      %ErlangArray{ array | contents: new_contents, len: len}
+      %ErlangArray{array | contents: new_contents, len: len}
     end
 
     @impl true
-    def reduce(%ErlangArray{len: _,contents: contents}, acc, fun) do
+    def reduce(%ErlangArray{len: _, contents: contents}, acc, fun) do
       :array.foldl(fn _index, val, acc -> fun.(val, acc) end, acc, contents)
     end
 
     @impl true
-    def reduce_right(%ErlangArray{len: _,contents: contents}, acc, fun) do
+    def reduce_right(%ErlangArray{len: _, contents: contents}, acc, fun) do
       :array.foldr(fn _index, val, acc -> fun.(acc, val) end, acc, contents)
     end
 
     @impl true
-    def get(%ErlangArray{len: _ , contents: contents}, index) do
+    def get(%ErlangArray{len: _, contents: contents}, index) do
       if index < 0 do
         :array.get(index + :array.size(contents), contents)
       else
@@ -162,12 +171,11 @@ defmodule Arrays.Implementations.ErlangArray do
       end
     end
 
-    
     @impl true
     def len(array) do
-      
       array.len
     end
+
     @impl true
     def replace(array = %ErlangArray{len: len, contents: contents}, index, item) do
       new_contents =
@@ -177,21 +185,21 @@ defmodule Arrays.Implementations.ErlangArray do
           :array.set(index, item, contents)
         end
 
-      %ErlangArray {array | contents: new_contents, len: len}
+      %ErlangArray{array | contents: new_contents, len: len}
     end
 
     @impl true
     def append(array = %ErlangArray{len: len, contents: contents}, item) do
       len = len + 1
       new_contents = :array.set(len, item, contents)
-      %ErlangArray{ array | contents: new_contents,len: len}
+      %ErlangArray{array | contents: new_contents, len: len}
     end
 
     @impl true
     def resize(array = %ErlangArray{len: len, contents: contents}, new_size, default) do
       changed = change_default(contents, default)
       new_contents = :array.resize(new_size, changed)
-      %ErlangArray{ array | contents: new_contents , len: len}
+      %ErlangArray{array | contents: new_contents, len: len}
     end
 
     # NOTE: We depend on the exact implementation of the `:array` record here.
@@ -205,6 +213,7 @@ defmodule Arrays.Implementations.ErlangArray do
       up_to_next_multiple_of_10 = 10 * div(sparse_size, 10) + 10 - 1
       {:array, a, b, _old_default, vals} = raw_array
       new_array = {:array, a, b, new_default, vals}
+
       Enum.reduce(sparse_size..up_to_next_multiple_of_10, new_array, fn index, arr ->
         :array.set(index, new_default, arr)
       end)
@@ -231,7 +240,7 @@ defmodule Arrays.Implementations.ErlangArray do
     end
 
     @impl true
-    def slice(array = %ErlangArray{len: _,  contents:  contents}, start, amount) do
+    def slice(array = %ErlangArray{len: _, contents: contents}, start, amount) do
       @for.build_slice(array, start, amount, empty(default: :array.default(contents)))
     end
 

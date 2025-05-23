@@ -99,8 +99,6 @@ defmodule Arrays.Implementations.MapArray do
     raise ArgumentError, @undefined_pop_message
   end
 
-
-
   @doc false
   def build_slice(%MapArray{contents: contents}, start, length, into) do
     for index <- start..(start + length - 1), into: into do
@@ -115,11 +113,13 @@ defmodule Arrays.Implementations.MapArray do
     def size(%MapArray{contents: contents}) do
       map_size(contents)
     end
+
     @impl true
- 
-   def len(%MapArray{contents: contents}) do
-     map_size(contents)
-   end
+
+    def len(%MapArray{contents: contents}) do
+      map_size(contents)
+    end
+
     @impl true
     def map(array = %MapArray{contents: contents}, fun) do
       new_contents = :maps.map(fn _key, value -> fun.(value) end, contents)
