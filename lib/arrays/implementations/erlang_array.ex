@@ -13,7 +13,7 @@ defmodule Arrays.Implementations.ErlangArray do
 
   alias __MODULE__
 
-  defstruct contents: :array.new([default: nil])
+  defstruct len: 0, contents: :array.new([default: nil])
 
   @doc """
   Create an `%ErlangArray{}`-struct from an `:array`-record.
@@ -23,16 +23,17 @@ defmodule Arrays.Implementations.ErlangArray do
       #Arrays.Implementations.ErlangArray<[]>
   """
   def from_raw(raw_array) do
-    %ErlangArray{contents: raw_array}
+    %ErlangArray{ len: :array.size(raw_array),contents: raw_array}
   end
 
   @doc """
-  Turn an %ErlangArray{}-struct back into an `:array`-record.
+  Turn an %ErlangArray{len: len, }-struct back into an `:array`-record.
 
         iex> Arrays.new([1, 2, 3], implementation: Arrays.Implementations.ErlangArray) |> ErlangArray.to_raw()
         {:array, 3, 10, nil, {1, 2, 3, nil, nil, nil, nil, nil, nil, nil}}
   """
-  def to_raw(%ErlangArray{contents: contents}) do
+  def to_raw(%ErlangArray{len: _,contents: contents}) do
+    
     contents
   end
 
@@ -60,7 +61,7 @@ defmodule Arrays.Implementations.ErlangArray do
 
         Note that `FunLand` is an optional dependency of `Arrays` so you need to add it to your `mix.exs` dependencies manually to use it.
         """
-        def reduce(array = %ErlangArray{}, acc, fun) do
+        def reduce(array = %ErlangArray{len: len, }, acc, fun) do
           Arrays.Protocol.reduce(array, acc, fun)
         end
       end)
@@ -92,7 +93,7 @@ defmodule Arrays.Implementations.ErlangArray do
   """ |> String.trim
 
   @impl Access
-  def get_and_update(array = %ErlangArray{contents: contents}, index, function) when index >= 0 do
+  def get_and_update(array = %ErlangArray{len: len, contents: contents}, index, function) when index >= 0 do
     if index >= :array.size(contents) do
       raise ArgumentError
     else
@@ -100,7 +101,7 @@ defmodule Arrays.Implementations.ErlangArray do
       case function.(value) do
         {get, new_value} ->
           new_contents = :array.set(index, new_value, contents)
-          {get, %ErlangArray{array | contents: new_contents}}
+          {get, %ErlangArray{ array | contents: new_contents, len: len}}
         :pop ->
           raise ArgumentError, @undefined_pop_message
       end
@@ -108,11 +109,11 @@ defmodule Arrays.Implementations.ErlangArray do
   end
 
   @impl Access
-  def get_and_update(array = %ErlangArray{contents: contents}, index, function) when index < 0 do
-    if index < (-:array.size(contents)) do
+  def get_and_update(array = %ErlangArray{len: len, contents: _}, index, function) when index < 0 do
+    if (index < len) do
       raise ArgumentError
     else
-      get_and_update(array, index + :array.size(contents), function)
+      get_and_update(array, index + len, function)
     end
   end
 
@@ -137,23 +138,23 @@ defmodule Arrays.Implementations.ErlangArray do
     end
 
     @impl true
-    def map(array = %ErlangArray{contents: contents}, fun) do
+    def map(array = %ErlangArray{len: len, contents: contents}, fun) do
       new_contents = :array.map(fn _index, val -> fun.(val) end, contents)
-      %ErlangArray{array | contents: new_contents}
+      %ErlangArray{ array | contents: new_contents, len: len}
     end
 
     @impl true
-    def reduce(%ErlangArray{contents: contents}, acc, fun) do
+    def reduce(%ErlangArray{len: _,contents: contents}, acc, fun) do
       :array.foldl(fn _index, val, acc -> fun.(val, acc) end, acc, contents)
     end
 
     @impl true
-    def reduce_right(%ErlangArray{contents: contents}, acc, fun) do
+    def reduce_right(%ErlangArray{len: _,contents: contents}, acc, fun) do
       :array.foldr(fn _index, val, acc -> fun.(acc, val) end, acc, contents)
     end
 
     @impl true
-    def get(%ErlangArray{contents: contents}, index) do
+    def get(%ErlangArray{len: _ , contents: contents}, index) do
       if index < 0 do
         :array.get(index + :array.size(contents), contents)
       else
@@ -161,8 +162,14 @@ defmodule Arrays.Implementations.ErlangArray do
       end
     end
 
+    
     @impl true
-    def replace(array = %ErlangArray{contents: contents}, index, item) do
+    def len(array) do
+      
+      array.len
+    end
+    @impl true
+    def replace(array = %ErlangArray{len: len, contents: contents}, index, item) do
       new_contents =
         if index < 0 do
           :array.set(index + :array.size(contents), item, contents)
@@ -170,20 +177,21 @@ defmodule Arrays.Implementations.ErlangArray do
           :array.set(index, item, contents)
         end
 
-      %ErlangArray{array | contents: new_contents}
+      %ErlangArray {array | contents: new_contents, len: len}
     end
 
     @impl true
-    def append(array = %ErlangArray{contents: contents}, item) do
-      new_contents = :array.set(:array.size(contents), item, contents)
-      %ErlangArray{array | contents: new_contents}
+    def append(array = %ErlangArray{len: len, contents: contents}, item) do
+      len = len + 1
+      new_contents = :array.set(len, item, contents)
+      %ErlangArray{ array | contents: new_contents,len: len}
     end
 
     @impl true
-    def resize(array = %ErlangArray{contents: contents}, new_size, default) do
+    def resize(array = %ErlangArray{len: len, contents: contents}, new_size, default) do
       changed = change_default(contents, default)
       new_contents = :array.resize(new_size, changed)
-      %ErlangArray{array | contents: new_contents}
+      %ErlangArray{ array | contents: new_contents , len: len}
     end
 
     # NOTE: We depend on the exact implementation of the `:array` record here.
@@ -203,7 +211,7 @@ defmodule Arrays.Implementations.ErlangArray do
     end
 
     @impl true
-    def extract(array = %ErlangArray{contents: contents}) do
+    def extract(array = %ErlangArray{len: len, contents: contents}) do
       case :array.size(contents) do
         0 ->
           {:error, :empty}
@@ -212,7 +220,7 @@ defmodule Arrays.Implementations.ErlangArray do
           index = size - 1
           elem = :array.get(index, contents)
           contents_rest = :array.resize(index, contents)
-          array_rest = %ErlangArray{array | contents: contents_rest}
+          array_rest = %ErlangArray{array | contents: contents_rest, len: len}
           {:ok, {elem, array_rest}}
       end
     end
@@ -223,14 +231,14 @@ defmodule Arrays.Implementations.ErlangArray do
     end
 
     @impl true
-    def slice(array = %ErlangArray{}, start, amount) do
-      @for.build_slice(array, start, amount, empty(default: :array.default(array.contents)))
+    def slice(array = %ErlangArray{len: _,  contents:  contents}, start, amount) do
+      @for.build_slice(array, start, amount, empty(default: :array.default(contents)))
     end
 
     @impl true
     def empty(options) when is_list(options) do
       contents = :array.new([default: nil] ++ options)
-      %ErlangArray{contents: contents}
+      %ErlangArray{len: :array.size(contents), contents: contents}
     end
   end
 end

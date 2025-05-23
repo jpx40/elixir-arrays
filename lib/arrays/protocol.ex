@@ -66,6 +66,9 @@ defprotocol Arrays.Protocol do
   @spec get(array, index) :: any
   def get(array, index)
 
+  @spec len(array) :: integer()
+  def len(array)
+
   @doc """
   Replaces the element in `array` at `index` with `value`.
 

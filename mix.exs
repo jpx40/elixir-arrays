@@ -25,8 +25,8 @@ defmodule Arrays.Mixfile do
     ]
   end
 
-  defp elixirc_paths(:test),   do: ["lib", "test/support"]
-  defp elixirc_paths(_),       do: ["lib"]
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 
   # Run "mix help compile.app" to learn about applications.
   def application do
@@ -40,14 +40,12 @@ defmodule Arrays.Mixfile do
     [
       {:extractable, "~> 1.0"},
       {:insertable, "~> 1.0"},
-      {:fun_land, "~> 0.10.0", optional: true},
-
-      {:ex_doc, "~> 0.23", only: :dev, runtime: false},
-      {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
-      {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
-      {:excoveralls, "~> 0.13", only: [:test]},
-
-      {:benchee, "~> 1.0", only: [:dev]},
+      # {:fun_land, "~> 0.9.2", optional: true},
+      {:ex_doc, "~>  0.38.1", only: :dev, runtime: false},
+      {:dialyxir, "~> 1.4", only: [:dev], runtime: false},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:excoveralls, "~> 0.18.5", only: [:test]},
+      {:benchee, "~> 1.4", only: [:dev]},
       {:benchee_csv, "~> 1.0", only: [:dev]},
       {:benchee_markdown, "~> 0.2", only: [:dev]},
       {:benchee_html, "~> 1.0", only: [:dev]}
@@ -76,12 +74,11 @@ defmodule Arrays.Mixfile do
       logo: "brand/logo_text.png",
       groups_for_modules: [
         Main: [Arrays],
-        "Implementations": ~r{^Arrays.Implementations},
+        Implementations: ~r{^Arrays.Implementations},
         "For Implementers": [Arrays.Protocol, Arrays.CommonProtocolImplementations],
         Other: ~r"^.*"
       ],
-      nest_modules_by_prefix: [Arrays, Arrays.Implementations],
+      nest_modules_by_prefix: [Arrays, Arrays.Implementations]
     ]
   end
 end
-
