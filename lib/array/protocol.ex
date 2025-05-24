@@ -1,12 +1,12 @@
-defprotocol Arrays.Protocol do
+defprotocol Array.Protocol do
   @moduledoc """
   This protocol is implemented by all array types.
 
   Do not call functions in this module directly if you want to use an array in your code.
-  Instead, use the functions in the `Arrays` module, which will use the methods of this protocol.
+  Instead, use the functions in the `Array` module, which will use the methods of this protocol.
   """
   @typedoc """
-  Any datatype implementing the `Arrays.Protocol`.
+  Any datatype implementing the `Array.Protocol`.
   """
   @type array :: t()
 
@@ -25,7 +25,7 @@ defprotocol Arrays.Protocol do
   @doc """
   The number of elements in the array.
 
-  Called by `Arrays.size/1`
+  Called by `Array.size/1`
   """
   @spec size(array) :: non_neg_integer
   def size(array)
@@ -33,7 +33,7 @@ defprotocol Arrays.Protocol do
   @doc """
   Maps a function over an array, returning a new array.
 
-  Called by `Arrays.map/2`
+  Called by `Array.map/2`
   """
   @spec map(array, (current_value :: value -> updated_value :: value)) :: array
   def map(array, fun)
@@ -43,7 +43,7 @@ defprotocol Arrays.Protocol do
 
   Note that `fun` takes the accumulator as _second_ (right) parameter and the item as _first_ (left) parameter.
 
-  Called by `Arrays.reduce/3`
+  Called by `Array.reduce/3`
   """
   @spec reduce(array, acc :: any, (item :: any, acc :: any -> any)) :: array
   def reduce(array, acc, fun)
@@ -53,7 +53,7 @@ defprotocol Arrays.Protocol do
 
   Note that `fun` takes the accumulator as _first_ (left) parameter and the item as _second_ (right) parameter.
 
-  Called by `Arrays.reduce_right/3`
+  Called by `Array.reduce_right/3`
   """
   @spec reduce_right(array, acc :: any, (acc :: any, item :: any -> any)) :: array
   def reduce_right(array, acc, fun)
@@ -61,7 +61,7 @@ defprotocol Arrays.Protocol do
   @doc """
   Retrieves the value stored in `array` of the element at `index`.
 
-  Called by `Arrays.get/2`
+  Called by `Array.get/2`
   """
   @spec get(array, index) :: any
   def get(array, index)
@@ -72,7 +72,7 @@ defprotocol Arrays.Protocol do
   @doc """
   Replaces the element in `array` at `index` with `value`.
 
-  Called by `Arrays.replace/3`
+  Called by `Array.replace/3`
   """
   @spec replace(array, index, item :: any) :: array
   def replace(array, index, item)
@@ -80,7 +80,7 @@ defprotocol Arrays.Protocol do
   @doc """
   Appends ('pushes') a single element to the end of the array.
 
-  Called by `Arrays.append/2`
+  Called by `Array.append/2`
   """
   @spec append(array, item :: any) :: array
   def append(array, item)
@@ -88,7 +88,7 @@ defprotocol Arrays.Protocol do
   @doc """
   Extracts ('pops') a single element from the end of the array.
 
-  Called by `Arrays.extract/1`
+  Called by `Array.extract/1`
   """
   @spec extract(array) :: {:ok, {item :: any, array}} | {:error, :empty}
   def extract(array)
@@ -99,7 +99,7 @@ defprotocol Arrays.Protocol do
   When made smaller, truncates elements beyond the first `size` elements will be removed.
   When made larger, new elements will receive `default` as value.
 
-  Called by `Arrays.resize/2`
+  Called by `Array.resize/2`
   """
   @spec resize(array, size :: non_neg_integer, default :: any) :: array
   def resize(array, size, default)
@@ -107,7 +107,7 @@ defprotocol Arrays.Protocol do
   @doc """
   Transforms the array into a list.
 
-  Called by `Arrays.to_list/1`
+  Called by `Array.to_list/1`
   """
   @spec to_list(array) :: list
   def to_list(array)
@@ -115,7 +115,7 @@ defprotocol Arrays.Protocol do
   @doc """
   Return a contiguous slice of some elements in the array.
 
-  Handling of bounds is handled in the `Arrays` module,
+  Handling of bounds is handled in the `Array` module,
   so we know for certain that `0 <= start_index < size(array)`
   and `start_index + length < size(array)`.
   """
@@ -132,7 +132,7 @@ defprotocol Arrays.Protocol do
   @doc """
   Should create a new instance of your custom array type.
 
-  This is called internally by functions such as `Arrays.new/0` and `Arrays.empty/1`.
+  This is called internally by functions such as `Array.new/0` and `Array.empty/1`.
 
   NOTE: This function will not be dispatched by normal protocol handling.
   It will be called directly:
