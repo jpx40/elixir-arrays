@@ -1,4 +1,4 @@
-defmodule Arrays.Implementations.MapArray do
+defmodule Array.Implementations.MapArray do
   @moduledoc """
   An array implementation based on the built-in Map structure.
   """

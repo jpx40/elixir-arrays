@@ -1,4 +1,4 @@
-defmodule Arrays.Implementations.ErlangArray do
+defmodule Array.Implementations.ErlangArray do
   @moduledoc """
   Wraps the Erlang [`:array`](http://erlang.org/doc/man/array.html) module.
 
