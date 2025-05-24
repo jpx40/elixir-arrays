@@ -2,7 +2,7 @@ defmodule Array.Implementations.ErlangArray do
   @moduledoc """
   Wraps the Erlang [`:array`](http://erlang.org/doc/man/array.html) module.
 
-  These kinds of arrays use a 'functional tree' format,
+  These kinds of Array use a 'functional tree' format,
   with a leaf size of 10 nodes wide ([ref.](https://github.com/erlang/otp/blob/maint/lib/stdlib/src/array.erl#L108)).
 
   Common operations like element access thus take O(log10(n)) time.
@@ -20,7 +20,7 @@ defmodule Array.Implementations.ErlangArray do
 
 
       iex> :array.new([]) |> ErlangArray.from_raw()
-      #Arrays.Implementations.ErlangArray<[]>
+      #Array.Implementations.ErlangArray<[]>
   """
   def from_raw(raw_array) do
     %ErlangArray{len: :array.size(raw_array), contents: raw_array}
@@ -29,7 +29,7 @@ defmodule Array.Implementations.ErlangArray do
   @doc """
   Turn an %ErlangArray{len: len, }-struct back into an `:array`-record.
 
-        iex> Arrays.new([1, 2, 3], implementation: Arrays.Implementations.ErlangArray) |> ErlangArray.to_raw()
+        iex> Array.new([1, 2, 3], implementation: Array.Implementations.ErlangArray) |> ErlangArray.to_raw()
         {:array, 3, 10, nil, {1, 2, 3, nil, nil, nil, nil, nil, nil, nil}}
   """
   def to_raw(%ErlangArray{len: _, contents: contents}) do
@@ -45,9 +45,9 @@ defmodule Array.Implementations.ErlangArray do
         @doc """
         Implementation for `FunLand.Mappable.map`.
 
-        Note that `FunLand` is an optional dependency of `Arrays` so you need to add it to your `mix.exs` dependencies manually to use it.
+        Note that `FunLand` is an optional dependency of `Array` so you need to add it to your `mix.exs` dependencies manually to use it.
         """
-        def map(array, fun), do: Arrays.Protocol.map(array, fun)
+        def map(array, fun), do: Array.Protocol.map(array, fun)
       end
     )
   end
@@ -62,10 +62,10 @@ defmodule Array.Implementations.ErlangArray do
         @doc """
         Implementation for `FunLand.Reducible.reduce`.
 
-        Note that `FunLand` is an optional dependency of `Arrays` so you need to add it to your `mix.exs` dependencies manually to use it.
+        Note that `FunLand` is an optional dependency of `Array` so you need to add it to your `mix.exs` dependencies manually to use it.
         """
         def reduce(array = %ErlangArray{len: len}, acc, fun) do
-          Arrays.Protocol.reduce(array, acc, fun)
+          Array.Protocol.reduce(array, acc, fun)
         end
       end
     )
@@ -93,7 +93,7 @@ defmodule Array.Implementations.ErlangArray do
   end
 
   @undefined_pop_message """
-                         There is no efficient implementation possible to remove an element from a random location in an array, so `Access.pop/2` (and returning `:pop` from `Access.get_and_update/3` ) are not supported by #{inspect(__MODULE__)}. If you want to remove the last element, use `Arrays.extract/1`.
+                         There is no efficient implementation possible to remove an element from a random location in an array, so `Access.pop/2` (and returning `:pop` from `Access.get_and_update/3` ) are not supported by #{inspect(__MODULE__)}. If you want to remove the last element, use `Array.extract/1`.
                          """
                          |> String.trim()
 
@@ -138,8 +138,8 @@ defmodule Array.Implementations.ErlangArray do
     end
   end
 
-  defimpl Arrays.Protocol do
-    alias Arrays.Implementations.ErlangArray
+  defimpl Array.Protocol do
+    alias Array.Implementations.ErlangArray
 
     @impl true
     def size(%ErlangArray{contents: contents}) do

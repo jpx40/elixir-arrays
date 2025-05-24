@@ -16,9 +16,9 @@ defmodule Array.Implementations.MapArray do
         @doc """
         Implementation for `FunLand.Mappable.map`.
 
-        Note that `FunLand` is an optional dependency of `Arrays` so you need to add it to your `mix.exs` dependencies manually to use it.
+        Note that `FunLand` is an optional dependency of `Array` so you need to add it to your `mix.exs` dependencies manually to use it.
         """
-        def map(array, fun), do: Arrays.Protocol.map(array, fun)
+        def map(array, fun), do: Array.Protocol.map(array, fun)
       end
     )
   end
@@ -33,7 +33,7 @@ defmodule Array.Implementations.MapArray do
         @doc """
         Implementation for `FunLand.Reducible.reduce`.
 
-        Note that `FunLand` is an optional dependency of `Arrays` so you need to add it to your `mix.exs` dependencies manually to use it.
+        Note that `FunLand` is an optional dependency of `Array` so you need to add it to your `mix.exs` dependencies manually to use it.
         """
         def reduce(%MapArray{contents: contents}, acc, fun) do
           reduce(contents, acc, fun, 0, :maps.size(contents))
@@ -64,7 +64,7 @@ defmodule Array.Implementations.MapArray do
   def fetch(%MapArray{}, _index), do: :error
 
   @undefined_pop_message """
-                         There is no efficient implementation possible to remove an element from a random location in an array, so `Access.pop/2` (and returning `:pop` from `Access.get_and_update/3` ) are not supported by #{inspect(__MODULE__)}. If you want to remove the last element, use `Arrays.extract/1`.
+                         There is no efficient implementation possible to remove an element from a random location in an array, so `Access.pop/2` (and returning `:pop` from `Access.get_and_update/3` ) are not supported by #{inspect(__MODULE__)}. If you want to remove the last element, use `Array.extract/1`.
                          """
                          |> String.trim()
 
@@ -106,8 +106,8 @@ defmodule Array.Implementations.MapArray do
     end
   end
 
-  defimpl Arrays.Protocol do
-    alias Arrays.Implementations.MapArray
+  defimpl Array.Protocol do
+    alias Array.Implementations.MapArray
 
     @impl true
     def size(%MapArray{contents: contents}) do
